@@ -1,0 +1,6 @@
+This is a simple implementation of the game of war.
+A class named "Cardd" is created, and it's elements are enumerated values of rank and suit.
+A function named build decks creates an abstraction of a 52 playing card deck, and then divides it randomly into 2 26 card decks.
+The 2 decks are abstractions for the players role in the game. Using this, the function named war is called.
+war compares the ranks of the top card on each stack, incremements a counter for the player with the higher rank, and then compares
+the counters to determine a winner.
