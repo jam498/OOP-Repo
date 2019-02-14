@@ -3,6 +3,8 @@
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
+#include <random>
+
 
 using std::vector;
 using std::stack;
@@ -13,9 +15,11 @@ enum Suit {
 	Hearts,
 	Diamonds
 };
+
 enum Rank {
 	Ace,
-	Two, Three,
+	Two,
+	Three,
 	Four,
 	Five,
 	Six,
@@ -30,60 +34,48 @@ enum Rank {
 
 struct Card
 {
-	Suit suit;
-	Rank rank;
+	unsigned char data;
+	Card() = default;
+	Card(Rank r, Suit s)
+		: data(static_cast<unsigned>(s) << 4 | static_cast<unsigned>(r))
+	{ }
+	Suit get_Suit() const { return static_cast<Suit>(data >> 4 ); };
+	Rank get_Rank() const { return static_cast<Rank>(data & 0xf); };
+	//Suit suit;
+	//Rank rank;
 };
+
 std::ostream& operator<<(std::ostream& os, Rank r) {
 	switch (r)
 	{
-	case(Ace) : os << "Ace";
-		break;
-	case(Two) : os << "Two";
-		break;
-	case(Three) : os << "Three";
-		break;
-	case(Four) : os << "Four";
-		break;
-	case(Five) : os << "Five";
-		break;
-	case(Six) : os << "Six";
-		break;
-	case(Seven) : os << "Seven";
-		break;
-	case(Eight) : os << "Eight";
-		break;
-	case(Nine) : os << "Nine";
-		break;
-	case(Ten) : os << "Ten";
-		break;
-	case(Jack) : os << "Jack";
-		break;
-	case(Queen) : os << "Queen";
-		break;
-	case(King) : os << "King";
-		break;
+    case(Ace) : return os << "A";
+	case(Two) : return os << "2";
+	case(Three) : return os << "3";
+	case(Four) : return os << "4";
+	case(Five) : return os << "5";
+	case(Six) : return os << "6";
+	case(Seven) : return os << "7";
+	case(Eight) : return os << "8";
+	case(Nine) : return os << "9";
+	case(Ten) : return os << "10";
+	case(Jack) : return os << "J";
+	case(Queen) : return os << "Q";
+	case(King) : return os << "K";
 	}
-	return os;
 }
 
 std::ostream& operator<<(std::ostream& os, Suit s) {
 	switch (s)
 	{
-	case(Spades) : os << "Spades";
-		break;
-	case(Clubs) : os << "Clubs";
-		break;
-	case(Hearts) : os << "Hearts";
-		break;
-	case(Diamonds) : os << "Diamonds";
-		break;
+	case(Spades) : return os << "S";
+	case(Clubs) : return os << "C";
+	case(Hearts) : return os << "H";
+	case(Diamonds) : return os << "D";
 	}
-	return os;
 }
 
 std::ostream& operator<<(std::ostream& os, Card c) {
-	os << c.rank << " of " << c.suit;
-	return os;
+	return os << c.get_Rank() << c.get_Suit();
 }
 
 void buildDecks(stack<Card>&, stack<Card>&);
@@ -104,13 +96,13 @@ void buildDecks(stack<Card>& p1, stack<Card>&p2)
 {
 	vector<Card> deck;
 	int divide;
+
 	Card temp;
 	for (int s = 0; s < 4; s++)
 	{
-		temp.suit = static_cast<Suit>(s);
 		for (int r = 0; r < 13; r++)
 		{
-			temp.rank = static_cast<Rank>(r);
+			temp = Card(static_cast<Rank>(r), static_cast<Suit>(s));
 			deck.push_back(temp);
 		}
 	}
@@ -132,15 +124,15 @@ void war(stack<Card> p1, stack<Card>p2)
 	int player1 = 0, player2 = 0;
 	for (int i = 0; i < 26; i++)
 	{
-		if (static_cast<int>(p1.top().rank) > static_cast<int>(p2.top().rank))
+		if (static_cast<int>(p1.top().get_Rank()) > static_cast<int>(p2.top().get_Rank()))
 		{
 			player1++;
-			std::cout << p1.top() << "beats " << p2.top() << ", Point to Player 1\n";
+			std::cout << p1.top() << " beats " << p2.top() << ", Point to Player 1\n";
 		}
-		else if (static_cast<int>(p1.top().rank) < static_cast<int>(p2.top().rank))
+		else if (static_cast<int>(p1.top().get_Rank()) < static_cast<int>(p2.top().get_Rank()))
 		{
 			player2++;
-			std::cout << p2.top() << " beats " << p1.top() << ", Point to Player 2\n";
+			std::cout << p1.top() << " beats " << p2.top() << ", Point to Player 2\n";
 		}
 		p1.pop();
 		p2.pop();
