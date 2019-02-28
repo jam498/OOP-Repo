@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <random>
-
+#include <cassert>
 
 using std::vector;
 using std::stack;
@@ -15,7 +15,6 @@ enum Suit {
 	Hearts,
 	Diamonds
 };
-
 enum Rank {
 	Ace,
 	Two,
@@ -32,18 +31,134 @@ enum Rank {
 	King,
 };
 
-struct Card
-{
-	unsigned char data;
-	Card() = default;
-	Card(Rank r, Suit s)
-		: data(static_cast<unsigned>(s) << 4 | static_cast<unsigned>(r))
-	{ }
-	Suit get_Suit() const { return static_cast<Suit>(data >> 4 ); };
-	Rank get_Rank() const { return static_cast<Rank>(data & 0xf); };
-	//Suit suit;
-	//Rank rank;
+enum Color {
+	red,
+	black
 };
+
+enum Ctype {
+	J,
+	St
+};
+
+
+struct StandardCard {
+	Rank r;
+	Suit s;
+};
+
+struct Joker {
+	Color color;
+};
+
+union Card
+{
+	Card()
+	{
+		type = St;
+		card.r = Ace;
+		card.s = Spades;
+	}
+	Card(StandardCard a)
+	{
+		card = a;
+		type = St;
+	}
+
+	Card(Rank r, Suit s)
+	{
+		card.r = r;
+
+		type = St;
+	}
+
+	Card(Joker a)
+	{
+		joke = a;
+		type = J;
+	}
+	Ctype type;
+	StandardCard card;
+	Joker joke;
+};
+
+std::ostream& operator<<(std::ostream& os, Rank r) {
+	switch (r)
+	{
+	case(Ace) : return os << "Ace";
+	case(Two) : return os << "Two";
+	case(Three) : return os << "Three";
+	case(Four) : return os << "Four";
+	case(Five) : return os << "Five";
+	case(Six) : return os << "Six";
+	case(Seven) : return os << "Seven";
+	case(Eight) : return os << "Eight";
+	case(Nine) : return os << "Nine";
+	case(Ten) : return os << "Ten";
+	case(Jack) : return os << "Jack";
+	case(Queen) : return os << "Queen";
+	case(King) : return os << "King";
+	}
+}
+
+std::ostream& operator<<(std::ostream& os, Suit s) {
+	switch (s)
+	{
+	case(Spades) : return os << "Spades";
+	case(Clubs) : return os << "Clubs";
+	case(Hearts) : return os << "Hearts";
+	case(Diamonds) : return os << "Diamonds";
+	}
+}
+
+std::ostream& operator<<(std::ostream& os, Card c) {
+	if (c.type == St)
+		return os << c.card.r << " of " << c.card.s;
+
+}
+
+bool operator==(Card a, Card b)
+{
+		if (a.card.s == b.card.s)
+			if (a.card.r == b.card.s)
+				return true;
+	return false;
+
+}
+bool operator>(Card a, Card b)
+{
+		if (a.card.s == b.card.s)
+			if (a.card.r == b.card.r)
+				return true;
+	return false;
+
+}
+bool operator<(Card a, Card b)
+{
+		if (a.card.s == b.card.s)
+			if (a.card.r == b.card.r)
+				return true;
+	return false;
+
+}
+bool operator>=(Card a, Card b)
+{
+		if (a.card.s == b.card.s)
+			if (a.card.r == b.card.r)
+				return true;
+	return false;
+
+}
+
+bool operator<=(Card a, Card b)
+{
+		if (a.card.s == b.card.s)
+			if (a.card.r == b.card.r)
+				return true;
+	return false;
+}
+
+
 
 std::ostream& operator<<(std::ostream& os, Rank r) {
 	switch (r)
@@ -75,7 +190,7 @@ std::ostream& operator<<(std::ostream& os, Suit s) {
 }
 
 std::ostream& operator<<(std::ostream& os, Card c) {
-	return os << c.get_Rank() << c.get_Suit();
+	return os << c.card.r << c.card.s;
 }
 
 void buildDecks(stack<Card>&, stack<Card>&);
@@ -124,12 +239,12 @@ void war(stack<Card> p1, stack<Card>p2)
 	int player1 = 0, player2 = 0;
 	for (int i = 0; i < 26; i++)
 	{
-		if (static_cast<int>(p1.top().get_Rank()) > static_cast<int>(p2.top().get_Rank()))
+		if (static_cast<int>(p1.top().card.r) > static_cast<int>(p2.top().card.r))
 		{
 			player1++;
 			std::cout << p1.top() << " beats " << p2.top() << ", Point to Player 1\n";
 		}
-		else if (static_cast<int>(p1.top().get_Rank()) < static_cast<int>(p2.top().get_Rank()))
+		else if (static_cast<int>(p1.top().card.r) < static_cast<int>(p2.top().card.r))
 		{
 			player2++;
 			std::cout << p1.top() << " beats " << p2.top() << ", Point to Player 2\n";
